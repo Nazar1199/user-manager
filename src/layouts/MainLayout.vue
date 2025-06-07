@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Учетные записи пользователей
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>by Nazar Ignatenko</div>
       </q-toolbar>
     </q-header>
 
@@ -28,7 +28,7 @@
         <q-item-label
           header
         >
-          Essential Links
+          Меню
         </q-item-label>
 
         <EssentialLink
