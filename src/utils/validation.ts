@@ -21,3 +21,18 @@ export function validateField(
   }
   return true;
 }
+
+/**
+ * Правила валидации для полей пользователя
+ */
+export const userValidationRules = {
+  labels: [
+    (val: string) => validateField(val, { required: false, max: 50 })
+  ],
+  login: [
+    (val: string) => validateField(val, { required: true, max: 100 })
+  ],
+  password: (isRequired: boolean) => [
+    (val: string) => validateField(val, { required: isRequired, max: 100 })
+  ]
+};

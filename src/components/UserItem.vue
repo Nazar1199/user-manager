@@ -85,7 +85,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
 import type { UserLabel } from 'src/models/UserLabel';
-import { validateField } from '../utils/validation';
+import { userValidationRules } from '../utils/validation';
 
 export default defineComponent({
   name: 'UserItem',
@@ -110,15 +110,9 @@ export default defineComponent({
       { label: 'Локальная', value: UserRecordType.Local }
     ];
 
-    const labelsRules = [
-      (val: string) => validateField(val, { required: false, max: 50 })
-    ];
-    const loginRules = [
-      (val: string) => validateField(val, { required: true, max: 100 })
-    ];
-    const passwordRules = [
-      (val: string) => validateField(val, { required: localUser.recordType === UserRecordType.Local, max: 100 })
-    ];
+    const labelsRules = userValidationRules.labels;
+    const loginRules = userValidationRules.login;
+    const passwordRules = userValidationRules.password(localUser.recordType === UserRecordType.Local);
 
     function isAllFieldsValid(): boolean {
       const labelsValid = labelsRules.every(rule => rule(labelsInput.value) === true);
@@ -155,6 +149,9 @@ export default defineComponent({
 
     function onRecordTypeChange(val: UserRecordType) {
       localUser.recordType = val;
+      // Обновляем правила для пароля при смене типа
+      // (Quasar не пересчитывает массив правил автоматически)
+      // passwordRules = userValidationRules.password(val === UserRecordType.Local);
       if (val === UserRecordType.LDAP) {
         delete localUser.password;
       } else {
