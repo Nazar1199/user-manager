@@ -85,6 +85,7 @@ import { defineComponent, reactive, ref } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
 import type { UserLabel } from 'src/models/UserLabel';
+import { validateField } from '../utils/validation';
 
 export default defineComponent({
   name: 'UserItem',
@@ -108,16 +109,6 @@ export default defineComponent({
       { label: 'LDAP', value: UserRecordType.LDAP },
       { label: 'Локальная', value: UserRecordType.Local }
     ];
-
-    function validateField(value: string, { required = false, max = 100 } = {}) {
-      if (required && (!value || value.trim() === '')) {
-        return 'Обязательное';
-      }
-      if (value && value.length > max) {
-        return `Максимум ${max} символов`;
-      }
-      return true;
-    }
 
     const labelsRules = [
       (val: string) => validateField(val, { required: false, max: 50 })
