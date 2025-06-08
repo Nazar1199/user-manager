@@ -1,43 +1,52 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page class="q-pa-md">
+    <div class="row items-center q-mb-md">
+      <div class="text-h5 col">Пользователи</div>
+      <q-btn color="primary" label="Добавить" class="q-ml-md" @click="addUser" />
+      <q-btn color="secondary" label="Загрузить пример" class="q-ml-md" @click="loadExample" />
+    </div>
+    <user-list
+      :users="users"
+      @update="onUserUpdate"
+      @delete="onUserDelete"
+    />
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Todo, Meta } from 'src/models/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
+import UserList from 'components/UserList.vue';
+import { useUserStore } from 'src/stores/user-store';
+import type { User } from 'src/models/User';
+import { UserRecordType } from 'src/models/UserRecordType';
 
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1'
-  },
-  {
-    id: 2,
-    content: 'ct2'
-  },
-  {
-    id: 3,
-    content: 'ct3'
-  },
-  {
-    id: 4,
-    content: 'ct4'
-  },
-  {
-    id: 5,
-    content: 'ct5'
-  }
-]);
+const userStore = useUserStore();
+const users = ref<User[]>(userStore.users);
 
-const meta = ref<Meta>({
-  totalCount: 1200
+userStore.$subscribe(() => {
+  users.value = [...userStore.users];
 });
+
+function onUserUpdate(updatedUser: User) {
+  userStore.updateUser(updatedUser);
+}
+
+function onUserDelete(id: number) {
+  userStore.removeUser(id);
+}
+
+function addUser() {
+  const maxId = users.value.length ? Math.max(...users.value.map(u => u.id)) : 0;
+  userStore.addUser({
+    id: maxId + 1,
+    labels: [],
+    login: '',
+    password: '',
+    recordType: UserRecordType.Local
+  });
+}
+
+function loadExample() {
+  userStore.setExampleUsers();
+}
 </script>
