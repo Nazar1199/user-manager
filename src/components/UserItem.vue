@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, reactive, ref, watch } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
 import type { UserLabel } from 'src/models/UserLabel';
@@ -97,7 +97,7 @@ export default defineComponent({
   emits: ['update', 'delete'],
   setup(props, { emit }) {
     const isPwd = ref(true);
-    const localUser = ref<User>({ ...props.user });
+    const localUser = reactive<User>({ ...props.user });
 
     const labelsInput = ref(
       props.user.labels.map((label: UserLabel) => label.text).join('; ')
@@ -126,15 +126,15 @@ export default defineComponent({
       (val: string) => validateField(val, { required: true, max: 100 })
     ];
     const passwordRules = [
-      (val: string) => validateField(val, { required: localUser.value.recordType === UserRecordType.Local, max: 100 })
+      (val: string) => validateField(val, { required: localUser.recordType === UserRecordType.Local, max: 100 })
     ];
 
     function isAllFieldsValid(): boolean {
       const labelsValid = labelsRules.every(rule => rule(labelsInput.value) === true);
-      const loginValid = loginRules.every(rule => rule(localUser.value.login) === true);
+      const loginValid = loginRules.every(rule => rule(localUser.login) === true);
       const passwordValid =
-        localUser.value.recordType === UserRecordType.Local
-          ? passwordRules.every(rule => rule(localUser.value.password || '') === true)
+        localUser.recordType === UserRecordType.Local
+          ? passwordRules.every(rule => rule(localUser.password || '') === true)
           : true;
       return labelsValid && loginValid && passwordValid;
     }
@@ -146,7 +146,7 @@ export default defineComponent({
     }
 
     function updateLabels() {
-      localUser.value.labels = labelsInput.value
+      localUser.labels = labelsInput.value
         .split(';')
         .map(s => s.trim())
         .filter(Boolean)
@@ -155,25 +155,27 @@ export default defineComponent({
     }
 
     function emitUpdate() {
-      emit('update', { ...localUser.value });
+      emit('update', { ...localUser });
     }
 
     function emitDelete() {
-      emit('delete', localUser.value.id);
+      emit('delete', localUser.id);
     }
 
     function onRecordTypeChange(val: UserRecordType) {
-      localUser.value.recordType = val;
+      localUser.recordType = val;
       if (val === UserRecordType.LDAP) {
-        delete localUser.value.password;
+        delete localUser.password;
+      } else {
+        localUser.password = ''
       }
     }
 
     watch(
       () => props.user,
       (newUser) => {
-        localUser.value = { ...newUser };
-        labelsInput.value = localUser.value.labels.map(l => l.text).join('; ');
+        localUser = { ...newUser };
+        labelsInput.value = localUser.labels.map(l => l.text).join('; ');
       },
       { deep: true }
     );
