@@ -5,7 +5,8 @@
         <q-input
           v-model="labelsInput"
           :rules="labelsRules"
-          label="Метки"
+          :label="$t('label')"
+          :hint="$t('label_hint')"
           @blur="updateLabels"
           dense
           outlined
@@ -15,7 +16,7 @@
         <q-select
           v-model="localUser.recordType"
           :options="recordTypeOptions"
-          label="Тип записи"
+          :label="$t('recordType')"
           emit-value
           map-options
           @update:model-value="onRecordTypeChange"
@@ -27,11 +28,11 @@
       <div 
         class="col-xs-12 col-sm-6"
         :class="user.recordType === recordTypes.LDAP ? 'col-lg-4' : 'col-lg-2'"
-        >
+      >
         <q-input
           v-model="localUser.login"
           :rules="loginRules"
-          label="Логин"
+          :label="$t('login')"
           @blur="submitIfValid"
           dense
           outlined 
@@ -40,10 +41,10 @@
       <div 
         v-if="user.recordType !== recordTypes.LDAP"
         class="col-lg-2 col-xs-12 col-sm-6"
-        >
+      >
         <q-input
           v-model="localUser.password"
-          label="Пароль"
+          :label="$t('password')"
           :type="isPwd ? 'password' : 'text'"
           :rules="passwordRules"
           @blur="submitIfValid"
@@ -72,7 +73,7 @@
             class="bg-black text-body2" 
             :offset="[10, 10]"
           >
-            Удалить
+            {{ $t('deleteTooltip') }}
           </q-tooltip>
         </q-btn>
       </div>

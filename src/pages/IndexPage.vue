@@ -1,48 +1,45 @@
 <template>
   <q-page class="q-pa-md">
     <div class="row items-center q-mb-md">
-      <div class="text-h5">Учетные записи</div>
+      <div class="text-h5">{{ $t('users') }}</div>
       <q-btn 
         color="primary" 
         icon="add"
         class="q-ml-md" 
         @click="addUser" 
+      >
+        <q-tooltip 
+        class="bg-black text-body2" 
+        :offset="[10, 10]"
         >
-          <q-tooltip 
-            class="bg-black text-body2" 
-            :offset="[10, 10]"
-          >
-            Добавить новую запись
-          </q-tooltip>
-        </q-btn>
+          {{ $t('add') }}
+        </q-tooltip>
+      </q-btn>
       <q-btn 
         color="secondary" 
         icon="storage"
         class="q-ml-md" 
         @click="loadExample" 
-        >
-          <q-tooltip 
-            class="bg-black text-body2" 
-            :offset="[10, 10]"
+      >
+        <q-tooltip 
+          class="bg-black text-body2" 
+          :offset="[10, 10]"
           >
-            Загрузить подготовленные данные
-          </q-tooltip>
-        </q-btn>
+          {{ $t('load') }}
+        </q-tooltip>
+      </q-btn>
     </div>
 
     <div>
       <q-banner 
-        class="bg-grey-3 q-mb-md"
-        dense
+        class="bg-grey-3 q-mb-md" 
+        dense 
         rounded
         >
         <template v-slot:avatar>
-          <q-icon 
-            name="help_outline" 
-            color="primary" 
-            />
+          <q-icon name="help_outline" color="primary" />
         </template>
-        Для указания нескольких меток для одной пары логин/пароль используйте разделитель ;
+        {{ $t('help') }}
       </q-banner>
     </div>
     <user-list

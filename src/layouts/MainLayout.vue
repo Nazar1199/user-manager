@@ -12,10 +12,24 @@
         />
 
         <q-toolbar-title>
-          Учетные записи пользователей
+          {{ $t('title') }}
         </q-toolbar-title>
 
-        <div>by Nazar Ignatenko</div>
+        <div class="q-mr-md">{{ $t('by') }}</div>
+        <q-select
+          v-model="currentLocale"
+          :options="langOptions"
+          dense
+          borderless
+          emit-value
+          map-options
+          style="min-width: 120px"
+          class="q-ml-md"
+        >
+          <template #prepend>
+            <q-icon name="language" />
+          </template>
+        </q-select>
       </q-toolbar>
     </q-header>
 
@@ -25,10 +39,8 @@
       bordered
     >
       <q-list>
-        <q-item-label
-          header
-        >
-          Меню
+        <q-item-label header>
+          {{ $t('menu') }}
         </q-item-label>
 
         <EssentialLink
@@ -46,19 +58,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+
+const { locale } = useI18n();
+const currentLocale = ref(locale.value);
+
+const langOptions = [
+  { label: 'Русский', value: 'ru-RU' },
+  { label: 'English', value: 'en-US' }
+];
+
+watch(currentLocale, val => {
+  locale.value = val;
+});
 
 const linksList: EssentialLinkProps[] = [
   {
-    title: 'Home',
-    caption: 'К заданию',
+    title: 'home',
+    caption: 'home',
     icon: 'home',
     link: '/'
   },
   {
-    title: 'Telegram',
-    caption: '@FranXX_02',
+    title: 'telegram',
+    caption: 'telegram',
     icon: 'public',
     link: 'https://t.me/FranXX_02'
   },
