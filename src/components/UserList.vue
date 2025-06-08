@@ -11,7 +11,6 @@
           @update="onUpdate"
           @delete="onDelete"
         />
-        <q-separator v-if="props.index < users.length - 1" spaced />
       </div>
     </template>
   </q-virtual-scroll>

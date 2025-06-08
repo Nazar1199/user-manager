@@ -4,57 +4,61 @@ import { UserRecordType } from '../models/UserRecordType';
 
 const STORAGE_KEY = 'user-manager-users';
 
+export interface UserLabel {
+    text: string;
+}
+
 // Пример данных пользователей
 export const EXAMPLE_USERS: User[] = [
   {
     id: 1,
-    labels: ['админ', 'основной'],
+    labels: [{ text: 'админ' }, { text: 'основной' }],
     login: 'admin',
     password: 'admin123',
     recordType: UserRecordType.Local
   },
   {
     id: 2,
-    labels: ['пользователь', 'ldap'],
+    labels: [{ text: 'пользователь' }, { text: 'ldap' }],
     login: 'ldap_user',
     recordType: UserRecordType.LDAP
   },
   {
     id: 3,
-    labels: ['тест'],
+    labels: [{ text: 'тест' }],
     login: 'testuser',
     password: 'testpass',
     recordType: UserRecordType.Local
   },
   {
     id: 4,
-    labels: ['гость'],
+    labels: [{ text: 'гость' }],
     login: 'guest',
     password: 'guest',
     recordType: UserRecordType.Local
   },
   {
     id: 5,
-    labels: ['ldap', 'менеджер'],
+    labels: [{ text: 'ldap' }, { text: 'менеджер' }],
     login: 'manager_ldap',
     recordType: UserRecordType.LDAP
   },
   {
     id: 6,
-    labels: ['разработчик'],
+    labels: [{ text: 'разработчик' }],
     login: 'dev',
     password: 'devpass',
     recordType: UserRecordType.Local
   },
   {
     id: 7,
-    labels: ['ldap', 'аналитик'],
+    labels: [{ text: 'ldap' }, { text: 'аналитик' }],
     login: 'analyst_ldap',
     recordType: UserRecordType.LDAP
   },
   {
     id: 8,
-    labels: ['локальный', 'оператор'],
+    labels: [{ text: 'локальный' }, { text: 'оператор' }],
     login: 'operator',
     password: 'operatorpass',
     recordType: UserRecordType.Local

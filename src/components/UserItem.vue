@@ -4,6 +4,7 @@
       <div class="col-lg-2 col-xs-12 col-sm-6">
         <q-input
           v-model="labelsInput"
+          :rules="[ val => val.length <= 50 || 'Максимум 50 символов' ]"
           label="Метки"
           @blur="updateLabels"
           @change="updateLabels"
@@ -30,6 +31,10 @@
         <q-input
           v-model="localUser.login"
           label="Логин"
+          :rules="[ 
+            val => val.length <= 100 || 'Максимум 100 символов',
+            val => val !== '' || 'Обязательное' 
+          ]"
           @input="emitUpdate"
           dense
           outlined 
@@ -43,6 +48,10 @@
           v-model="localUser.password"
           label="Пароль"
           :type="isPwd ? 'password' : 'text'"
+          :rules="[ 
+            val => val.length <= 100 || 'Максимум 100 символов', 
+            val => val !== '' || 'Обязательное' 
+          ]"
           @input="emitUpdate"
           dense
           outlined 
@@ -74,6 +83,7 @@
 import { defineComponent, ref, watch } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
+import type { UserLabel } from 'src/models/UserLabel';
 
 export default defineComponent({
   name: 'UserItem',
@@ -88,8 +98,11 @@ export default defineComponent({
     const isPwd = ref(true);
     const localUser = ref<User>({ ...props.user });
 
-    const labelsInput = ref(props.user.labels.join('; '));
 
+    const labelsInput = ref(props.user.labels
+      .map((label: UserLabel) => label.text)
+      .join('; '));
+      
     const recordTypes = UserRecordType;
     const recordTypeOptions = [
       { label: 'LDAP', value: UserRecordType.LDAP },
@@ -100,7 +113,8 @@ export default defineComponent({
       localUser.value.labels = labelsInput.value
         .split(';')
         .map(s => s.trim())
-        .filter(Boolean);
+        .filter(Boolean)
+        .map(text => ({ text }));
       emitUpdate();
     }
 
@@ -108,7 +122,7 @@ export default defineComponent({
       () => props.user,
       (newUser) => {
         localUser.value = { ...newUser };
-        labelsInput.value = newUser.labels.join('; ');
+        labelsInput.value = localUser.value.labels.map(l => l.text).join('; ');
       },
       { deep: true }
     );
@@ -122,6 +136,7 @@ export default defineComponent({
     }
 
     function emitUpdate() {
+      console.log(`Обновить пользователя на: ${JSON.stringify({ ...localUser.value })}`)
       emit('update', { ...localUser.value });
     }
 
