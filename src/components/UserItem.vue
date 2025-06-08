@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
 import type { UserLabel } from 'src/models/UserLabel';
@@ -135,7 +135,6 @@ export default defineComponent({
     function submitIfValid() {
       if (isAllFieldsValid()) {
         emitUpdate();
-      }
     }
 
     function updateLabels() {
