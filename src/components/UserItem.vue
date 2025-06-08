@@ -169,12 +169,13 @@ export default defineComponent({
       } else {
         localUser.password = ''
       }
+      emitUpdate()
     }
 
     watch(
       () => props.user,
       (newUser) => {
-        localUser = { ...newUser };
+        Object.assign(localUser, { ...newUser });
         labelsInput.value = localUser.labels.map(l => l.text).join('; ');
       },
       { deep: true }
