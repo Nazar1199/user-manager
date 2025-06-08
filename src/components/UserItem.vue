@@ -135,6 +135,7 @@ export default defineComponent({
     function submitIfValid() {
       if (isAllFieldsValid()) {
         emitUpdate();
+      }
     }
 
     function updateLabels() {
