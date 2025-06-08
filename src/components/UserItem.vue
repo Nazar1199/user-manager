@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, watch } from 'vue';
+import { defineComponent, reactive, ref } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
 import type { UserLabel } from 'src/models/UserLabel';
@@ -171,15 +171,6 @@ export default defineComponent({
       }
       emitUpdate()
     }
-
-    watch(
-      () => props.user,
-      (newUser) => {
-        Object.assign(localUser, { ...newUser });
-        labelsInput.value = localUser.labels.map(l => l.text).join('; ');
-      },
-      { deep: true }
-    );
 
     return {
       localUser,
