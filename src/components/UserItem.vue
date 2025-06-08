@@ -4,12 +4,11 @@
       <div class="col-lg-2 col-xs-12 col-sm-6">
         <q-input
           v-model="labelsInput"
-          :rules="[ val => val.length <= 50 || 'Максимум 50 символов' ]"
+          :rules="labelsRules"
           label="Метки"
           @blur="updateLabels"
-          @change="updateLabels"
           dense
-          outlined 
+          outlined
         />
       </div>
       <div class="col-lg-2 col-xs-12 col-sm-6">
@@ -20,6 +19,7 @@
           emit-value
           map-options
           @update:model-value="onRecordTypeChange"
+          @blur="submitIfValid"
           dense
           outlined 
         />
@@ -30,12 +30,9 @@
         >
         <q-input
           v-model="localUser.login"
+          :rules="loginRules"
           label="Логин"
-          :rules="[ 
-            val => val.length <= 100 || 'Максимум 100 символов',
-            val => val !== '' || 'Обязательное' 
-          ]"
-          @input="emitUpdate"
+          @blur="submitIfValid"
           dense
           outlined 
         />
@@ -48,11 +45,8 @@
           v-model="localUser.password"
           label="Пароль"
           :type="isPwd ? 'password' : 'text'"
-          :rules="[ 
-            val => val.length <= 100 || 'Максимум 100 символов', 
-            val => val !== '' || 'Обязательное' 
-          ]"
-          @input="emitUpdate"
+          :rules="passwordRules"
+          @blur="submitIfValid"
           dense
           outlined 
         >
@@ -80,7 +74,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref, watch, computed } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
 import type { UserLabel } from 'src/models/UserLabel';
@@ -98,16 +92,51 @@ export default defineComponent({
     const isPwd = ref(true);
     const localUser = ref<User>({ ...props.user });
 
+    const labelsInput = ref(
+      props.user.labels.map((label: UserLabel) => label.text).join('; ')
+    );
 
-    const labelsInput = ref(props.user.labels
-      .map((label: UserLabel) => label.text)
-      .join('; '));
-      
     const recordTypes = UserRecordType;
     const recordTypeOptions = [
       { label: 'LDAP', value: UserRecordType.LDAP },
       { label: 'Локальная', value: UserRecordType.Local }
     ];
+
+    function validateField(value: string, { required = false, max = 100 } = {}) {
+      if (required && (!value || value.trim() === '')) {
+        return 'Обязательное';
+      }
+      if (value && value.length > max) {
+        return `Максимум ${max} символов`;
+      }
+      return true;
+    }
+
+    const labelsRules = [
+      (val: string) => validateField(val, { required: false, max: 50 })
+    ];
+    const loginRules = [
+      (val: string) => validateField(val, { required: true, max: 100 })
+    ];
+    const passwordRules = [
+      (val: string) => validateField(val, { required: localUser.value.recordType === UserRecordType.Local, max: 100 })
+    ];
+
+    function isAllFieldsValid(): boolean {
+      const labelsValid = labelsRules.every(rule => rule(labelsInput.value) === true);
+      const loginValid = loginRules.every(rule => rule(localUser.value.login) === true);
+      const passwordValid =
+        localUser.value.recordType === UserRecordType.Local
+          ? passwordRules.every(rule => rule(localUser.value.password || '') === true)
+          : true;
+      return labelsValid && loginValid && passwordValid;
+    }
+
+    function submitIfValid() {
+      if (isAllFieldsValid()) {
+        emitUpdate();
+      }
+    }
 
     function updateLabels() {
       localUser.value.labels = labelsInput.value
@@ -115,6 +144,22 @@ export default defineComponent({
         .map(s => s.trim())
         .filter(Boolean)
         .map(text => ({ text }));
+      submitIfValid();
+    }
+
+    function emitUpdate() {
+      emit('update', { ...localUser.value });
+    }
+
+    function emitDelete() {
+      emit('delete', localUser.value.id);
+    }
+
+    function onRecordTypeChange(val: UserRecordType) {
+      localUser.value.recordType = val;
+      if (val === UserRecordType.LDAP) {
+        delete localUser.value.password;
+      }
       emitUpdate();
     }
 
@@ -127,33 +172,20 @@ export default defineComponent({
       { deep: true }
     );
 
-    function onRecordTypeChange(val: UserRecordType) {
-      localUser.value.recordType = val;
-      if (val === UserRecordType.LDAP) {
-        delete localUser.value.password;
-      }
-      emitUpdate();
-    }
-
-    function emitUpdate() {
-      console.log(`Обновить пользователя на: ${JSON.stringify({ ...localUser.value })}`)
-      emit('update', { ...localUser.value });
-    }
-
-    function emitDelete() {
-      emit('delete', localUser.value.id);
-    }
-
     return {
       localUser,
       labelsInput,
       recordTypes,
       recordTypeOptions,
       isPwd,
+      labelsRules,
+      loginRules,
+      passwordRules,
       updateLabels,
       emitUpdate,
       emitDelete,
-      onRecordTypeChange
+      onRecordTypeChange,
+      submitIfValid,
     };
   }
 });
