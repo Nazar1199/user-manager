@@ -6,7 +6,6 @@
           v-model="labelsInput"
           :rules="labelsRules"
           :label="$t('label')"
-          :hint="$t('label_hint')"
           @blur="updateLabels"
           dense
           outlined
