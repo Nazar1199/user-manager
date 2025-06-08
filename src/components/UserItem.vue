@@ -67,7 +67,14 @@
           round
           flat
           dense
-        />
+        >
+          <q-tooltip 
+            class="bg-black text-body2" 
+            :offset="[10, 10]"
+          >
+            Удалить
+          </q-tooltip>
+        </q-btn>
       </div>
     </div>
   </q-form>
@@ -160,7 +167,6 @@ export default defineComponent({
       if (val === UserRecordType.LDAP) {
         delete localUser.value.password;
       }
-      emitUpdate();
     }
 
     watch(
