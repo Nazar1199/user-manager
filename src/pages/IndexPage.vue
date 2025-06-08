@@ -17,7 +17,7 @@
         </q-btn>
       <q-btn 
         color="secondary" 
-        icon="download"
+        icon="storage"
         class="q-ml-md" 
         @click="loadExample" 
         >
