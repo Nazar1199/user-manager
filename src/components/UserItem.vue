@@ -84,8 +84,8 @@
 import { defineComponent, reactive, ref } from 'vue';
 import { UserRecordType } from '../models/UserRecordType';
 import type { User } from '../models/User';
-import type { UserLabel } from 'src/models/UserLabel';
 import { userValidationRules } from '../utils/validation';
+import { UserService } from '../services/user-service';
 
 export default defineComponent({
   name: 'UserItem',
@@ -101,7 +101,7 @@ export default defineComponent({
     const localUser = reactive<User>({ ...props.user });
 
     const labelsInput = ref(
-      props.user.labels.map((label: UserLabel) => label.text).join('; ')
+      UserService.labelsToString(props.user.labels)
     );
 
     const recordTypes = UserRecordType;
@@ -115,13 +115,10 @@ export default defineComponent({
     const passwordRules = userValidationRules.password(localUser.recordType === UserRecordType.Local);
 
     function isAllFieldsValid(): boolean {
-      const labelsValid = labelsRules.every(rule => rule(labelsInput.value) === true);
-      const loginValid = loginRules.every(rule => rule(localUser.login) === true);
-      const passwordValid =
-        localUser.recordType === UserRecordType.Local
-          ? passwordRules.every(rule => rule(localUser.password || '') === true)
-          : true;
-      return labelsValid && loginValid && passwordValid;
+      return UserService.validateUser({
+        ...localUser,
+        labels: UserService.parseLabels(labelsInput.value)
+      }).length === 0;
     }
 
     function submitIfValid() {
@@ -131,11 +128,7 @@ export default defineComponent({
     }
 
     function updateLabels() {
-      localUser.labels = labelsInput.value
-        .split(';')
-        .map(s => s.trim())
-        .filter(Boolean)
-        .map(text => ({ text }));
+      localUser.labels = UserService.parseLabels(labelsInput.value);
       submitIfValid();
     }
 
@@ -149,9 +142,6 @@ export default defineComponent({
 
     function onRecordTypeChange(val: UserRecordType) {
       localUser.recordType = val;
-      // Обновляем правила для пароля при смене типа
-      // (Quasar не пересчитывает массив правил автоматически)
-      // passwordRules = userValidationRules.password(val === UserRecordType.Local);
       if (val === UserRecordType.LDAP) {
         delete localUser.password;
       } else {
