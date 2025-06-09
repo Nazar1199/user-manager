@@ -46,7 +46,6 @@ See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-
 - **Services** — бизнес-логика, валидация, работа с API.
 - **Utils** — утилиты, валидация полей.
 - **i18n** — все тексты и сообщения.
-- **Тесты** — unit и e2e для всех ключевых сценариев.
 
 ## Поток данных
 
