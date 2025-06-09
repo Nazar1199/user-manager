@@ -2,7 +2,16 @@ import type { User } from '../models/User';
 import { userValidationRules } from '../utils/validation';
 import { UserRecordType } from '../models/UserRecordType';
 
+/**
+ * UserService — сервис для бизнес-логики, связанной с пользователями.
+ * Содержит методы для валидации пользователя и работы с метками.
+ */
 export class UserService {
+  /**
+   * Проверяет валидность пользователя по всем правилам.
+   * @param user Пользователь для проверки
+   * @returns Массив строк с названиями невалидных полей (например, ['login', 'password'])
+   */
   static validateUser(user: User): string[] {
     const errors: string[] = [];
     // Validate login
@@ -23,6 +32,11 @@ export class UserService {
     return errors;
   }
 
+  /**
+   * Преобразует строку меток в массив объектов { text: string }
+   * @param input Строка меток, разделённых точкой с запятой
+   * @returns Массив меток
+   */
   static parseLabels(input: string): { text: string }[] {
     return input
       .split(';')
@@ -31,6 +45,11 @@ export class UserService {
       .map(text => ({ text }));
   }
 
+  /**
+   * Преобразует массив меток в строку, разделённую точкой с запятой
+   * @param labels Массив меток
+   * @returns Строка меток
+   */
   static labelsToString(labels: { text: string }[]): string {
     return labels.map(l => l.text).join('; ');
   }
